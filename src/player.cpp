@@ -23,4 +23,9 @@ namespace Charge
 	{
 		return TYPE_PLAYER;
 	}
+	
+	const unsigned int Player::getOwner() const
+	{
+		return owner;
+	}
 };

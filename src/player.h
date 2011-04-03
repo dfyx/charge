@@ -17,6 +17,8 @@ namespace Charge
 
 		virtual void reactToPlayer(unsigned int id);
 		virtual const ActorType getType() const;
+		
+		const unsigned int getOwner() const;
 	};
 };
 
