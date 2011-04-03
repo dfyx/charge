@@ -18,4 +18,9 @@ namespace Charge
 			charge = -charge;
 		}
 	}
+	
+	const ActorType Player::getType() const
+	{
+		return TYPE_PLAYER;
+	}
 };

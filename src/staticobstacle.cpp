@@ -8,4 +8,9 @@ namespace Charge
 		shape.m_radius = radius;
 		this->charge = charge;
 	}
+	
+	const ActorType StaticObstacle::getType() const
+	{
+		return TYPE_STATIC;
+	}
 };

@@ -6,6 +6,14 @@
 
 namespace Charge
 {
+	enum ActorType
+	{
+		TYPE_UNKNOWN,
+		TYPE_STATIC,
+		TYPE_DYNAMIC,
+		TYPE_PLAYER
+	};
+	
 	class Actor
 	{
 	protected:
@@ -26,6 +34,8 @@ namespace Charge
 		const b2CircleShape getShape() const;
 		
 		virtual void reactToPlayer(unsigned int id) {};
+		
+		virtual const ActorType getType() const;
 	};
 };
 

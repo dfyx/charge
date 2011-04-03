@@ -9,4 +9,9 @@ namespace Charge
 		shape.m_radius = radius;
 		this->charge = charge;
 	}
+	
+	const ActorType DynamicObstacle::getType() const
+	{
+		return TYPE_DYNAMIC;
+	}
 };

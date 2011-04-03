@@ -11,6 +11,7 @@ namespace Charge
 	{
 	public:
 		StaticObstacle(b2Vec2 position, float charge, float radius = CHARGE_STATICOBSTACLE_DEFAULT_RADIUS);
+		virtual const ActorType getType() const;
 	};
 };
 

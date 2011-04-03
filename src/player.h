@@ -16,6 +16,7 @@ namespace Charge
 		Player(unsigned int owner, b2Vec2 position, float charge = CHARGE_PLAYER_DEFAULT_CHARGE, float radius = CHARGE_PLAYER_DEFAULT_RADIUS);
 
 		virtual void reactToPlayer(unsigned int id);
+		virtual const ActorType getType() const;
 	};
 };
 

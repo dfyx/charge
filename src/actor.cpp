@@ -51,4 +51,9 @@ namespace Charge
 	{
 		return shape;
 	}
+	
+	const ActorType Actor::getType() const
+	{
+		return TYPE_UNKNOWN;
+	}
 };

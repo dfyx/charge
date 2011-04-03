@@ -11,6 +11,7 @@ namespace Charge
 	{
 	public:
 		DynamicObstacle(b2Vec2 position, float charge, float radius = CHARGE_DYNAMICOBSTACLE_DEFAULT_RADIUS);
+		virtual const ActorType getType() const;
 	};
 };
 
