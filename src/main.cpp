@@ -16,6 +16,13 @@ using namespace Charge;
 CircularField *field;
 Player *player1, *player2;
 
+static float playerColors[][3] =
+{{0.5f, 0.5f, 0.5f},
+ {1.0f, 0.0f, 0.0f},
+ {0.0f, 0.0f, 1.0f},
+ {0.0f, 1.0f, 0.0f},
+ {1.0f, 1.0f, 0.0f}};
+
 void SetupRenderer()
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -87,6 +94,43 @@ void HandleInput(unsigned char key, int x, int y)
 	}
 }
 
+void setChargeColor(float charge)
+{
+	if(charge > 0)
+	{
+		glColor3f(1.0f, 0.3f, 0.3f);
+	}
+	else if(charge < 0)
+	{
+		glColor3f(0.5f, 0.5f, 1.0f);
+	}
+	else
+	{
+		glColor3f(0.5f, 0.5f, 0.5f);
+	}
+}
+
+void renderPlayer(Player *player)
+{
+	setChargeColor(player->getCharge());
+	DrawCircle(player->getPosition(), player->getRadius());
+	
+	glColor3fv(playerColors[player->getOwner()]);
+	DrawCircle(player->getPosition(), player->getRadius() / 2, true);
+}
+
+void renderStatic(StaticObstacle *obstacle)
+{
+	setChargeColor(obstacle->getCharge());
+	DrawCircle(obstacle->getPosition(), obstacle->getRadius(), true);
+}
+
+void renderDynamic(DynamicObstacle *obstacle)
+{
+	setChargeColor(obstacle->getCharge());
+	DrawCircle(obstacle->getPosition(), obstacle->getRadius());
+}
+
 void RenderScene()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -102,24 +146,18 @@ void RenderScene()
 	vector<Actor*>::iterator iter;
 	for(iter = actors.begin(); iter != actors.end(); iter++)
 	{
-		if((*iter)->getType() == TYPE_PLAYER)
+		switch((*iter)->getType())
 		{
-			glColor3d(1.0f, 1.0f, 0.0f);
+			case TYPE_PLAYER:
+				renderPlayer((Player*) *iter);
+				break;
+			case TYPE_STATIC:
+				renderStatic((StaticObstacle*) *iter);
+				break;
+			case TYPE_DYNAMIC:
+				renderDynamic((DynamicObstacle*) *iter);
+				break;
 		}
-		else
-		{
-			glColor3f(1.0f, 1.0f, 1.0f);
-		}
-		DrawCircle((*iter)->getPosition(), (*iter)->getRadius());
-		if((*iter)->getCharge() > 0)
-		{
-			glColor3f(1.0f, 0.0f, 0.0f);
-		}
-		else
-		{
-			glColor3f(0.0f, 0.0f, 1.0f);
-		}
-		DrawCircle((*iter)->getPosition(), (*iter)->getRadius() / 2, true);
 	}
 
 	glutSwapBuffers();
