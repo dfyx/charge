@@ -2,16 +2,20 @@
 
 namespace Charge
 {
-	Player::Player(b2Vec2 position, float charge, float radius)
+	Player::Player(unsigned int owner, b2Vec2 position, float charge, float radius)
 	{
 		bodyDef.position = position;
 		bodyDef.type = b2_dynamicBody;
 		shape.m_radius = radius;
 		this->charge = charge;
+		this->owner = owner;
 	}
 
-	void Player::invertCharge()
+	void Player::reactToPlayer(unsigned int id)
 	{
-		charge = -charge;
+		if(owner == id)
+		{
+			charge = -charge;
+		}
 	}
 };

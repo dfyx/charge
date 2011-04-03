@@ -7,11 +7,20 @@ namespace Charge
 	Field::Field()
 	{
 		world = new b2World(b2Vec2(0.0f, 0.0f), false);
+		cleanup = false;
 	}
 
 	Field::~Field()
 	{
 		delete world;
+		if(cleanup)
+		{
+			vector<Actor*>::iterator iter;
+			for(iter = actors.begin(); iter != actors.end(); iter++)
+			{
+				delete *iter;
+			}
+		}
 	}
 
 	void Field::addActor(Actor* actor)
@@ -51,5 +60,19 @@ namespace Charge
 
 		world->Step(timestep, 5, 5);
 		world->ClearForces();
+	}
+	
+	void Field::reactToPlayer(unsigned int id)
+	{
+		vector<Actor*>::iterator iter;
+		for(iter = actors.begin(); iter != actors.end(); iter++)
+		{
+			(*iter)->reactToPlayer(id);
+		}
+	}
+	
+	void Field::setCleanup(bool cleanup)
+	{
+		this->cleanup = cleanup;
 	}
 };

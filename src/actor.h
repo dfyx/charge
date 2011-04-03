@@ -24,6 +24,8 @@ namespace Charge
 
 		const b2BodyDef getBodyDef() const;
 		const b2CircleShape getShape() const;
+		
+		virtual void reactToPlayer(unsigned int id) {};
 	};
 };
 

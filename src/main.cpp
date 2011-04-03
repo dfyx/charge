@@ -1,13 +1,14 @@
 #include <iostream>
 #include <cstdio>
 #include <cmath>
-#include <GL/glut.h>
+#include <glut_wrap.h>
 
 #include "field.h"
 #include "staticobstacle.h"
 #include "dynamicobstacle.h"
 #include "player.h"
 #include "circularfield.h"
+#include "loader.h"
 
 using namespace std;
 using namespace Charge;
@@ -78,11 +79,11 @@ void HandleInput(unsigned char key, int x, int y)
 {
 	if(key == 'a')
 	{
-		player1->invertCharge();
+		field->reactToPlayer(1);
 	}
 	else if(key == 'l')
 	{
-		player2->invertCharge();
+		field->reactToPlayer(2);
 	}
 }
 
@@ -118,21 +119,9 @@ void RenderScene()
 }
 
 int main(int argc, char** argv)
-{
-	StaticObstacle s1(b2Vec2(1.0f, 0.0f), 1.0f);
-	StaticObstacle s2(b2Vec2(-1.0f, 0.0f), -1.0f);
-	DynamicObstacle d1(b2Vec2(0.0f, 0.0f), -1.0f);
-	Player p1(b2Vec2(0.0f, 1.0f));
-	Player p2(b2Vec2(0.0f, -1.0f), -CHARGE_PLAYER_DEFAULT_CHARGE);
-	player1 = &p1;
-	player2 = &p2;
-
-	field = new CircularField(2.0f);
-	field->addActor(&s1);
-	field->addActor(&s2);
-	//field->addActor(&d1);
-	field->addActor(&p1);
-	field->addActor(&p2);
+{	
+	Loader loader;
+	field = (CircularField*) loader.loadField("test.charge");
 
 	// Setup OpenGL
 	glutInit(&argc, argv);

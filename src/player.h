@@ -10,10 +10,12 @@ namespace Charge
 
 	class Player : public Actor
 	{
+	protected:
+		unsigned int owner;
 	public:
-		Player(b2Vec2 position, float charge = CHARGE_PLAYER_DEFAULT_CHARGE, float radius = CHARGE_PLAYER_DEFAULT_RADIUS);
+		Player(unsigned int owner, b2Vec2 position, float charge = CHARGE_PLAYER_DEFAULT_CHARGE, float radius = CHARGE_PLAYER_DEFAULT_RADIUS);
 
-		void invertCharge();
+		virtual void reactToPlayer(unsigned int id);
 	};
 };
 
