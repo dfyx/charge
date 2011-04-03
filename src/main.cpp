@@ -102,7 +102,14 @@ void RenderScene()
 	vector<Actor*>::iterator iter;
 	for(iter = actors.begin(); iter != actors.end(); iter++)
 	{
-		glColor3f(1.0f, 1.0f, 1.0f);
+		if((*iter)->getType() == TYPE_PLAYER)
+		{
+			glColor3d(1.0f, 1.0f, 0.0f);
+		}
+		else
+		{
+			glColor3f(1.0f, 1.0f, 1.0f);
+		}
 		DrawCircle((*iter)->getPosition(), (*iter)->getRadius());
 		if((*iter)->getCharge() > 0)
 		{
