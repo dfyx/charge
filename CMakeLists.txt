@@ -4,10 +4,12 @@ project(CHARGE)
 # no ppc because it's untested (and do we need it at all?)
 set(CMAKE_OSX_ARCHITECTURES "i386;x86_64")
 
-include_directories(/usr/local/include)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CHARGE_SOURCE_DIR})
 
 find_package(glut)
 find_package(opengl)
+find_package(Box2D)
+include_directories(${BOX2D_INCLUDE_DIRS})
 
 if(EXISTS ${GLUT_INCLUDE_DIR}/GL/glut.h)
 	message("Found at GL/glut.h")
@@ -22,4 +24,4 @@ include_directories(${CHARGE_BINARY_DIR}/src)
 
 file(GLOB_RECURSE CHARGE_SOURCES ${CHARGE_SOURCE_DIR}/src/*.cpp)
 add_executable(charge ${CHARGE_SOURCES})
-target_link_libraries(charge ${GLUT_LIBRARY} ${OPENGL_LIBRARY} -lBox2D)
+target_link_libraries(charge ${GLUT_LIBRARY} ${OPENGL_LIBRARY} ${BOX2D_LIBRARIES})
