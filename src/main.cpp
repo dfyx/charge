@@ -26,6 +26,7 @@ static float playerColors[][3] =
 void SetupRenderer()
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glEnable(GL_MULTISAMPLE);
 }
 
 void ChangeSize(int width, int height)
@@ -59,7 +60,15 @@ void DrawCircle(b2Vec2 position, float radius, bool filled = false)
 	glPushMatrix();
 	glTranslatef(position.x, position.y, 0.0f);
 
-	unsigned int segments = ceil(100 * radius);
+	unsigned int segments;
+	if(radius < 1)
+	{
+		segments = ceil(100 * sqrt(radius));
+	}
+	else
+	{
+		segments = ceil(100 * radius);
+	}
 	if(segments < 10)
 	{
 		segments = 10;
@@ -67,10 +76,15 @@ void DrawCircle(b2Vec2 position, float radius, bool filled = false)
 
 	if(filled)
 	{
+		glEnable(GL_MULTISAMPLE);
 		glBegin(GL_POLYGON);
 	}
 	else
 	{
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_BLEND);
+		glEnable(GL_LINE_SMOOTH);
+		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 		glBegin(GL_LINE_LOOP);
 	}
 	for(unsigned int i = 0; i < segments; i++)
@@ -78,6 +92,16 @@ void DrawCircle(b2Vec2 position, float radius, bool filled = false)
 		glVertex2f(cos(i * 2.0f * M_PI / segments) * radius, sin(i * 2.0f * M_PI / segments) * radius);
 	}
 	glEnd();
+	
+	if(filled)
+	{
+		glDisable(GL_MULTISAMPLE);
+	}
+	else
+	{
+		glDisable(GL_BLEND);
+		glDisable(GL_LINE_SMOOTH);
+	}
 
 	glPopMatrix();
 }
@@ -136,7 +160,7 @@ void RenderScene()
 	glClear(GL_COLOR_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-
+	
 	// Draw field
 	glColor3f(1.0f, 1.0f, 1.0f);
 	DrawCircle(b2Vec2(0.0f, 0.0f), field->getRadius());
@@ -170,7 +194,7 @@ int main(int argc, char** argv)
 
 	// Setup OpenGL
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_MULTISAMPLE);
 	glutInitWindowSize(800, 600);
 	glutCreateWindow("Charge");
 	glutReshapeFunc(ChangeSize);
