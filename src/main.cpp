@@ -26,7 +26,9 @@ static float playerColors[][3] =
 void SetupRenderer()
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+#ifdef GL_MULTISAMLE
 	glEnable(GL_MULTISAMPLE);
+#endif
 }
 
 void ChangeSize(int width, int height)
@@ -76,7 +78,9 @@ void DrawCircle(b2Vec2 position, float radius, bool filled = false)
 
 	if(filled)
 	{
+#ifdef GL_MULTISAMPLE
 		glEnable(GL_MULTISAMPLE);
+#endif
 		glBegin(GL_POLYGON);
 	}
 	else
@@ -95,7 +99,9 @@ void DrawCircle(b2Vec2 position, float radius, bool filled = false)
 	
 	if(filled)
 	{
+#ifdef GL_MULTISAMPLE
 		glDisable(GL_MULTISAMPLE);
+#endif GL_MULTISAMPLE
 	}
 	else
 	{

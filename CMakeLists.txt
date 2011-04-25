@@ -19,9 +19,15 @@ else(EXISTS ${GLUT_INCLUDE_DIR}/GL/glut.h)
 	SET(GLUT_HEADER glut/glut.h)
 endif(EXISTS ${GLUT_INCLUDE_DIR}/GL/glut.h)
 
+if(MSVC)
+	set(CHARGE_DEFINES ${CHARGE_DEFINES} _USE_MATH_DEFINES)
+endif(MSVC)
+
 configure_file(${CHARGE_SOURCE_DIR}/src/glut_wrap.h.in ${CHARGE_BINARY_DIR}/src/glut_wrap.h)
 include_directories(${CHARGE_BINARY_DIR}/src)
 
 file(GLOB_RECURSE CHARGE_SOURCES ${CHARGE_SOURCE_DIR}/src/*.cpp)
-add_executable(charge ${CHARGE_SOURCES})
+file(GLOB_RECURSE CHARGE_HEADERS ${CHARGE_SOURCE_DIR}/src/*.h)
+add_executable(charge ${CHARGE_SOURCES} ${CHARGE_HEADERS})
 target_link_libraries(charge ${GLUT_LIBRARY} ${OPENGL_LIBRARY} ${BOX2D_LIBRARIES})
+set_property(TARGET charge PROPERTY COMPILE_DEFINITIONS ${CHARGE_DEFINES})
