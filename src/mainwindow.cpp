@@ -9,7 +9,6 @@ namespace Charge
         Loader loader;
         field = (CircularField*) loader.loadField("test.charge");
 
-        this->resize(800, 600);
         canvas = new MainCanvas(field, this);
         setCentralWidget(canvas);
     }

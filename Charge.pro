@@ -21,7 +21,8 @@ SOURCES +=\
     src/actor.cpp \
     src/mainwindow.cpp \
     src/maincanvas.cpp \
-    src/main.cpp
+    src/main.cpp \
+    src/settingsdialog.cpp
 
 HEADERS  += \
     src/staticobstacle.h \
@@ -32,4 +33,5 @@ HEADERS  += \
     src/circularfield.h \
     src/actor.h \
     src/mainwindow.h \
-    src/maincanvas.h
+    src/maincanvas.h \
+    src/settingsdialog.h
