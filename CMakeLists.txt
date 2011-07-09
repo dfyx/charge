@@ -6,8 +6,8 @@ set(CMAKE_OSX_ARCHITECTURES "i386;x86_64")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CHARGE_SOURCE_DIR})
 
-find_package(glut)
-find_package(opengl)
+find_package(GLUT)
+find_package(OpenGL)
 find_package(Box2D)
 include_directories(${BOX2D_INCLUDE_DIRS})
 
