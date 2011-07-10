@@ -7,16 +7,16 @@
 
 namespace Charge
 {
-        class ChargeLoader
-	{
-	public:
-                Field *loadField(QString filename);
-	protected:
-                void initFieldType(QStringList values, Field **field);
-                void addPlayer(QStringList values, Field *field);
-                void addStatic(QStringList values, Field *field);
-                void addDynamic(QStringList values, Field *field);
-	};
+    class ChargeLoader
+    {
+    public:
+        Field *loadField(QString filename);
+    protected:
+        void initFieldType(QStringList values, Field **field);
+        void addPlayer(QStringList values, Field *field);
+        void addStatic(QStringList values, Field *field);
+        void addDynamic(QStringList values, Field *field);
+    };
 };
 
 #endif // CHARGE_LOADER_H

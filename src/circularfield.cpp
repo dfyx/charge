@@ -2,18 +2,18 @@
 
 namespace Charge
 {
-	CircularField::CircularField(float radius)
-	{
-		this->radius = radius;
-	}
+    CircularField::CircularField(float radius)
+    {
+        this->radius = radius;
+    }
 
-	const float CircularField::getRadius() const
-	{
-		return radius;
-	}
+    const float CircularField::getRadius() const
+    {
+        return radius;
+    }
 
-	bool CircularField::containsActor(Actor *actor) const
-	{
-		return actor->getPosition().Length() <= radius;
-	}
+    bool CircularField::containsActor(Actor *actor) const
+    {
+        return actor->getPosition().Length() <= radius;
+    }
 };
