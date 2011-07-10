@@ -9,7 +9,8 @@ QT       += core gui opengl
 TARGET = Charge
 TEMPLATE = app
 
-LIBS = -lBox2D
+LIBS += -lBox2D
+DEFINES += GLEW_STATIC
 
 SOURCES +=\
     src/staticobstacle.cpp \
@@ -22,7 +23,9 @@ SOURCES +=\
     src/maincanvas.cpp \
     src/main.cpp \
     src/settingsdialog.cpp \
-    src/chargeloader.cpp
+    src/chargeloader.cpp \
+    src/objectloader.cpp \
+    src/glew.cpp
 
 HEADERS  += \
     src/staticobstacle.h \
@@ -34,4 +37,6 @@ HEADERS  += \
     src/mainwindow.h \
     src/maincanvas.h \
     src/settingsdialog.h \
-    src/chargeloader.h
+    src/chargeloader.h \
+    src/objectloader.h \
+    src/glew.h

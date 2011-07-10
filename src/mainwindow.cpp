@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-#include "loader.h"
+#include "chargeloader.h"
 
 namespace Charge
 {

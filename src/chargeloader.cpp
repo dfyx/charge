@@ -1,4 +1,4 @@
-#include "loader.h"
+#include "chargeloader.h"
 
 #include "circularfield.h"
 #include "player.h"
