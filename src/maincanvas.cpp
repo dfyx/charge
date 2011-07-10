@@ -66,6 +66,16 @@ namespace Charge
         glRotatef(cameraTimer->elapsed() / 500.0f, 0.0f, 1.0f, 0.0f);
 
         // Draw field
+        glColor3f(0.1f, 0.1f, 0.1f);
+        GLUquadricObj *quadric = gluNewQuadric();
+        gluQuadricDrawStyle(quadric, GLU_FILL);
+
+        glPushMatrix();
+        glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+        gluCylinder(quadric, field->getRadius() * 1.1f, field->getRadius() * 1.1f, 4.0f, 40, 1);
+        gluDisk(quadric, 0.0f, field->getRadius() * 1.1f, 40, 1);
+        glPopMatrix();
+
         glColor3f(1.0f, 1.0f, 1.0f);
         drawCircle(b2Vec2(0.0f, 0.0f), field->getRadius());
 
