@@ -3,6 +3,7 @@
 
 #include <QGLWidget>
 #include <QTimer>
+#include <QTime>
 #include <QKeyEvent>
 #include "circularfield.h"
 
@@ -15,6 +16,7 @@ namespace Charge
         CircularField *field;
 
         QTimer *timer;
+        QTime *cameraTimer;
 
         const static unsigned int TIMESTEP = 10;
     public:

@@ -24,6 +24,8 @@ namespace Charge
         timer = new QTimer(this);
         timer->setSingleShot(false);
         connect(timer, SIGNAL(timeout()), this, SLOT(updateScene()));
+
+        cameraTimer = new QTime();
     }
 
     MainCanvas::~MainCanvas()
@@ -38,6 +40,7 @@ namespace Charge
         glEnable(GL_MULTISAMPLE);
     #endif
         timer->start(TIMESTEP);
+        cameraTimer->start();
     }
 
     void MainCanvas::resizeGL(int width, int height)
@@ -46,17 +49,8 @@ namespace Charge
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        float radius = field->getRadius() * 1.2f;
-        if(width > height)
-        {
-            float ratio = float(width) / float(height);
-            glOrtho(-radius * ratio, radius * ratio, -radius, radius, -1.0, 1.0);
-        }
-        else
-        {
-            float ratio = float(height) / float(width);
-            glOrtho(-radius, radius, -radius * ratio, radius * ratio, -1.0, 1.0);
-        }
+        //float radius = field->getRadius() * 1.2f;
+        gluPerspective(45.0f, double(width) / double(height), 1.0, 100.0f);
     }
 
     void MainCanvas::paintGL()
@@ -64,6 +58,12 @@ namespace Charge
         glClear(GL_COLOR_BUFFER_BIT);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
+
+        // Offset camera
+
+        glTranslatef(0.0f, 0.0f, -field->getRadius() * 3.0f);
+        glRotatef(-30.0f, 1.0f, 0.0f, 0.0f);
+        glRotatef(cameraTimer->elapsed() / 500.0f, 0.0f, 0.0f, 1.0f);
 
         // Draw field
         glColor3f(1.0f, 1.0f, 1.0f);
