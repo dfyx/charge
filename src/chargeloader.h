@@ -7,7 +7,7 @@
 
 namespace Charge
 {
-	class Loader
+        class ChargeLoader
 	{
 	public:
                 Field *loadField(QString filename);

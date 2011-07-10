@@ -7,11 +7,9 @@
 
 #include <QFile>
 
-using namespace std;
-
 namespace Charge
 {
-    Field *Loader::loadField(QString filename)
+    Field *ChargeLoader::loadField(QString filename)
     {
         Field *field = NULL;
         QFile file(filename);
@@ -43,10 +41,12 @@ namespace Charge
             }
         }
 
+        file.close();
+
         return field;
     }
 
-    void Loader::initFieldType(QStringList values, Field **field)
+    void ChargeLoader::initFieldType(QStringList values, Field **field)
     {
         if(*field != NULL || values.size() != 3)
         {
@@ -61,7 +61,7 @@ namespace Charge
         }
     }
 
-    void Loader::addPlayer(QStringList values, Field *field)
+    void ChargeLoader::addPlayer(QStringList values, Field *field)
     {
         if(field == NULL || values.size() != 6)
         {
@@ -76,7 +76,7 @@ namespace Charge
         field->addActor(new Player(id, b2Vec2(x, y), charge, radius));
     }
 
-    void Loader::addStatic(QStringList values, Field *field)
+    void ChargeLoader::addStatic(QStringList values, Field *field)
     {
         if(field == NULL || values.size() != 5)
         {
@@ -90,7 +90,7 @@ namespace Charge
         field->addActor(new StaticObstacle(b2Vec2(x, y), charge, radius));
     }
 
-    void Loader::addDynamic(QStringList values, Field *field)
+    void ChargeLoader::addDynamic(QStringList values, Field *field)
     {
         if(field == NULL || values.size() != 5)
         {

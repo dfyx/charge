@@ -6,7 +6,7 @@ namespace Charge
     MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent)
     {
-        Loader loader;
+        ChargeLoader loader;
         field = (CircularField*) loader.loadField("test.charge");
 
         canvas = new MainCanvas(field, this);
