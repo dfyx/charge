@@ -15,7 +15,7 @@ namespace Charge
     public:
         ObjectLoader();
 
-        void loadObject(QString filename, GLuint vertexBuffer, GLuint normalBuffer, GLuint texCoordBuffer, GLuint indexBuffer) const;
+        unsigned int loadObject(QString filename, GLuint vertexBuffer, GLuint normalBuffer, GLuint texCoordBuffer, GLuint indexBuffer) const;
     protected:
         const QVector3D loadVertex(QStringList fields) const;
         const QVector2D loadTextureCoords(QStringList fields) const;
