@@ -2,20 +2,20 @@
 #define CHARGE_LOADER_H
 
 #include "field.h"
-#include <string>
-#include <sstream>
+#include <QString>
+#include <QStringList>
 
 namespace Charge
 {
 	class Loader
 	{
 	public:
-		Field *loadField(std::string filename);
+                Field *loadField(QString filename);
 	protected:
-		void initFieldType(std::stringstream &linestream, Field **field);
-		void addPlayer(std::stringstream &linestream, Field *field);
-		void addStatic(std::stringstream &linestream, Field *field);
-		void addDynamic(std::stringstream &linestream, Field *field);
+                void initFieldType(QStringList values, Field **field);
+                void addPlayer(QStringList values, Field *field);
+                void addStatic(QStringList values, Field *field);
+                void addDynamic(QStringList values, Field *field);
 	};
 };
 
