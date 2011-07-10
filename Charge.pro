@@ -39,4 +39,6 @@ HEADERS  += \
     src/settingsdialog.h \
     src/chargeloader.h \
     src/objectloader.h \
-    src/glew.h
+    src/glew.h \
+    src/wglew.h \
+    src/glxew.h
