@@ -62,8 +62,8 @@ namespace Charge
         // Offset camera
 
         glTranslatef(0.0f, 0.0f, -field->getRadius() * 3.0f);
-        glRotatef(-30.0f, 1.0f, 0.0f, 0.0f);
-        glRotatef(cameraTimer->elapsed() / 500.0f, 0.0f, 0.0f, 1.0f);
+        glRotatef(50.0f, 1.0f, 0.0f, 0.0f);
+        glRotatef(cameraTimer->elapsed() / 500.0f, 0.0f, 1.0f, 0.0f);
 
         // Draw field
         glColor3f(1.0f, 1.0f, 1.0f);
@@ -119,7 +119,7 @@ namespace Charge
     void MainCanvas::drawCircle(b2Vec2 position, float radius, bool filled)
     {
         glPushMatrix();
-        glTranslatef(position.x, position.y, 0.0f);
+        glTranslatef(position.x, 0.0f, position.y);
 
         unsigned int segments;
         if(radius < 1)
@@ -152,7 +152,7 @@ namespace Charge
         }
         for(unsigned int i = 0; i < segments; i++)
         {
-            glVertex2f(cos(i * 2.0f * M_PI / segments) * radius, sin(i * 2.0f * M_PI / segments) * radius);
+            glVertex3f(cos(i * 2.0f * M_PI / segments) * radius, 0.0f, sin(i * 2.0f * M_PI / segments) * radius);
         }
         glEnd();
 
