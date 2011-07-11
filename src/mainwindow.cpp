@@ -11,6 +11,7 @@ namespace Charge
 
         canvas = new MainCanvas(field, this);
         setCentralWidget(canvas);
+        setFocusPolicy(Qt::StrongFocus);
     }
 
     MainWindow::~MainWindow()
@@ -20,6 +21,12 @@ namespace Charge
 
     void MainWindow::keyPressEvent(QKeyEvent *event)
     {
+        if(event->isAutoRepeat())
+        {
+            event->ignore();
+            return;
+        }
+
         if(event->key() == Qt::Key_A)
         {
             field->reactToPlayer(1);
