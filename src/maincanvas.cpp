@@ -135,6 +135,19 @@ namespace Charge
         float radius = player->getRadius();
         glScalef(radius, radius, radius);
         playerModel->draw();
+
+        // Temporary charge indicator
+        GLUquadricObj *quadric = gluNewQuadric();
+        gluQuadricDrawStyle(quadric, GLU_FILL);
+
+        // Double tessellation for slices or it would look really ugly
+        glPushAttrib(GL_ENABLE_BIT);
+        glDisable(GL_LIGHTING);
+        glTranslatef(0.0f, 1.5f, 0.0f);
+        setChargeColor(player->getCharge());
+        gluSphere(quadric, 0.4, 16, 8);
+        glPopAttrib();
+        gluDeleteQuadric(quadric);
         glPopMatrix();
     }
 
@@ -209,7 +222,7 @@ namespace Charge
     {
         if(charge > 0)
         {
-            glColor3f(1.0f, 0.3f, 0.3f);
+            glColor3f(1.0f, 0.5f, 0.5f);
         }
         else if(charge < 0)
         {
