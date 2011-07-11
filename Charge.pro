@@ -25,7 +25,8 @@ SOURCES +=\
     src/settingsdialog.cpp \
     src/chargeloader.cpp \
     src/objectloader.cpp \
-    src/glew.cpp
+    src/glew.cpp \
+    src/model.cpp
 
 HEADERS  += \
     src/staticobstacle.h \
@@ -41,4 +42,5 @@ HEADERS  += \
     src/objectloader.h \
     src/glew.h \
     src/wglew.h \
-    src/glxew.h
+    src/glxew.h \
+    src/model.h

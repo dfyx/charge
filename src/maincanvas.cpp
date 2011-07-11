@@ -30,6 +30,7 @@ namespace Charge
 
     MainCanvas::~MainCanvas()
     {
+        delete playerModel;
         delete timer;
     }
 
@@ -41,6 +42,10 @@ namespace Charge
     #endif
         timer->start(TIMESTEP);
         cameraTimer->start();
+
+        glewInit();
+
+        playerModel = new Model("data/models/player.obj");
     }
 
     void MainCanvas::resizeGL(int width, int height)
@@ -55,15 +60,29 @@ namespace Charge
 
     void MainCanvas::paintGL()
     {
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
+
+        glEnable(GL_LIGHTING);
+        glEnable(GL_LIGHT0);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_COLOR_MATERIAL);
+        glShadeModel(GL_SMOOTH);
+
 
         // Offset camera
 
         glTranslatef(0.0f, 0.0f, -field->getRadius() * 3.0f);
         glRotatef(50.0f, 1.0f, 0.0f, 0.0f);
         glRotatef(cameraTimer->elapsed() / 500.0f, 0.0f, 1.0f, 0.0f);
+
+        GLfloat specular[] = {1.0f, 1.0f, 1.0f , 1.0f};
+        float lightpos[] = {0.5f, 0.0f, 2.0f, 1.0f};
+        glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, specular);
+        glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
+
 
         // Draw field
         glColor3f(0.1f, 0.1f, 0.1f);
@@ -97,6 +116,9 @@ namespace Charge
                     break;
             }
         }
+
+        glColor3f(1.0, 0.0, 0.1);
+        playerModel->draw();
     }
 
     void MainCanvas::updateScene()
@@ -129,7 +151,7 @@ namespace Charge
     void MainCanvas::drawCircle(b2Vec2 position, float radius, bool filled)
     {
         glPushMatrix();
-        glTranslatef(position.x, 0.0f, position.y);
+        glTranslatef(position.x, 0.01f, position.y);
 
         unsigned int segments;
         if(radius < 1)

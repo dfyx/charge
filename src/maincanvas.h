@@ -1,11 +1,13 @@
 #ifndef MAINCANVAS_H
 #define MAINCANVAS_H
 
+#include "glew.h" // Don't move this to the source file. glew.h must be included before gl.h
 #include <QGLWidget>
 #include <QTimer>
 #include <QTime>
 #include <QKeyEvent>
 #include "circularfield.h"
+#include "model.h"
 
 namespace Charge
 {
@@ -17,6 +19,8 @@ namespace Charge
 
         QTimer *timer;
         QTime *cameraTimer;
+
+        Model *playerModel;
 
         const static unsigned int TIMESTEP = 10;
     public:
