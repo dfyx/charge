@@ -116,9 +116,6 @@ namespace Charge
                     break;
             }
         }
-
-        glColor3f(1.0, 0.0, 0.1);
-        playerModel->draw();
     }
 
     void MainCanvas::updateScene()
@@ -129,11 +126,16 @@ namespace Charge
 
     void MainCanvas::renderPlayer(Player *player)
     {
-        setChargeColor(player->getCharge());
-        drawCircle(player->getPosition(), player->getRadius());
+        //setChargeColor(player->getCharge());
+        //drawCircle(player->getPosition(), player->getRadius());
 
         glColor3fv(playerColors[player->getOwner()]);
-        drawCircle(player->getPosition(), player->getRadius() / 2, true);
+        glPushMatrix();
+        glTranslatef(player->getPosition().x, 0.0f, player->getPosition().y);
+        float radius = player->getRadius();
+        glScalef(radius, radius, radius);
+        playerModel->draw();
+        glPopMatrix();
     }
 
     void MainCanvas::renderStatic(StaticObstacle *obstacle)
