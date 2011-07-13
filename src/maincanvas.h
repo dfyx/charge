@@ -3,6 +3,7 @@
 
 #include "glew.h" // Don't move this to the source file. glew.h must be included before gl.h
 #include <QGLWidget>
+#include <QGLShaderProgram>
 #include <QTimer>
 #include <QTime>
 #include <QKeyEvent>
@@ -21,8 +22,14 @@ namespace Charge
         QTime *cameraTimer;
 
         Model *playerModel;
+        QGLShaderProgram *playerShaderProgram, *ambientShaderProgram;
+
+        // Buffers for deferred shading
+        GLuint frameBuffer, depthBuffer, diffuseBuffer, specularBuffer, positionBuffer, normalBuffer;
 
         const static unsigned int TIMESTEP = 10;
+
+        void setupProjectionCamera(int width, int height);
     public:
         explicit MainCanvas(CircularField *field, QWidget *parent = 0);
         ~MainCanvas();

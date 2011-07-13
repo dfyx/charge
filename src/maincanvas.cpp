@@ -31,6 +31,8 @@ namespace Charge
     MainCanvas::~MainCanvas()
     {
         delete playerModel;
+        delete playerShaderProgram;
+        delete ambientShaderProgram;
         delete timer;
     }
 
@@ -46,20 +48,76 @@ namespace Charge
         glewInit();
 
         playerModel = new Model("data/models/player.obj");
+        playerShaderProgram = new QGLShaderProgram(context());
+        playerShaderProgram->addShaderFromSourceFile(QGLShader::Vertex, "data/shaders/vertex/player.glsl");
+        playerShaderProgram->addShaderFromSourceFile(QGLShader::Fragment, "data/shaders/fragment/player.glsl");
+        playerShaderProgram->link();
+
+        ambientShaderProgram = new QGLShaderProgram(context());
+        ambientShaderProgram->addShaderFromSourceFile(QGLShader::Vertex, "data/shaders/vertex/player.glsl");
+        ambientShaderProgram->addShaderFromSourceFile(QGLShader::Fragment, "data/shaders/fragment/ambient.glsl");
+        ambientShaderProgram->link();
+
+        // Setup the frame buffer
+        glGenFramebuffers(1, &frameBuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+
+        // Add depth buffer
+        glGenRenderbuffers(1, &depthBuffer);
+        glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width(), height());
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
+
+        // Setup diffuse buffer
+        glGenTextures(1, &diffuseBuffer);
+        glBindTexture(GL_TEXTURE_2D, diffuseBuffer);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width(), height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, diffuseBuffer, 0);
+
+        // Setup specular buffer
+        glGenTextures(1, &specularBuffer);
+        glBindTexture(GL_TEXTURE_2D, specularBuffer);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width(), height(), 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, specularBuffer, 0);
+
+        // Setup position buffer
+        glGenTextures(1, &positionBuffer);
+        glBindTexture(GL_TEXTURE_2D, positionBuffer);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width(), height(), 0, GL_RGB, GL_FLOAT, NULL);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, positionBuffer, 0);
+
+        // Setup normal buffer
+        glGenTextures(1, &normalBuffer);
+        glBindTexture(GL_TEXTURE_2D, normalBuffer);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width(), height(), 0, GL_RGB, GL_FLOAT, NULL);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, normalBuffer, 0);
+
+        GLenum drawBuffers[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
+        glDrawBuffers(4, drawBuffers);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    void MainCanvas::setupProjectionCamera(int width, int height)
+    {
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        gluPerspective(45.0f, double(width) / double(height), 1.0, 100.0f);
     }
 
     void MainCanvas::resizeGL(int width, int height)
     {
         glViewport(0, 0, width, height);
 
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        //float radius = field->getRadius() * 1.2f;
-        gluPerspective(45.0f, double(width) / double(height), 1.0, 100.0f);
+        setupProjectionCamera(width, height);
     }
 
     void MainCanvas::paintGL()
     {
+        setupProjectionCamera(width(), height());
+
+        glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
@@ -82,7 +140,6 @@ namespace Charge
         glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
         glLightfv(GL_LIGHT0, GL_DIFFUSE, specular);
         glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
-
 
         // Draw field
         glColor3f(0.1f, 0.1f, 0.1f);
@@ -116,6 +173,51 @@ namespace Charge
                     break;
             }
         }
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+
+        glEnable(GL_TEXTURE_2D);
+        ambientShaderProgram->bind();
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, diffuseBuffer);
+        ambientShaderProgram->setUniformValue("diffuseBuffer", 0);
+
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, specularBuffer);
+        ambientShaderProgram->setUniformValue("specularBuffer", 1);
+
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, positionBuffer);
+        ambientShaderProgram->setUniformValue("positionBuffer", 2);
+
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, normalBuffer);
+        ambientShaderProgram->setUniformValue("normalBuffer", 3);
+
+        ambientShaderProgram->setUniformValue("ambientColor", 1.0f, 1.0f, 1.0f, 1.0f);
+
+        glBegin(GL_QUADS);
+            glTexCoord2f(1.0f, 1.0f);
+            glVertex3f(1.0f, 1.0f, 0.0f);
+            glTexCoord2f(0.0f, 1.0f);
+            glVertex3f(-1.0f, 1.0f, 0.0f);
+            glTexCoord2f(0.0f, 0.0f);
+            glVertex3f(-1.0f, -1.0f, 0.0f);
+            glTexCoord2f(1.0f, 0.0f);
+            glVertex3f(1.0f, -1.0f, 0.0f);
+        glEnd();
+        ambientShaderProgram->release();
+
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     void MainCanvas::updateScene()
@@ -134,7 +236,10 @@ namespace Charge
         glTranslatef(player->getPosition().x, 0.0f, player->getPosition().y);
         float radius = player->getRadius();
         glScalef(radius, radius, radius);
+
+        playerShaderProgram->bind();
         playerModel->draw();
+        playerShaderProgram->release();
 
         // Temporary charge indicator
         GLUquadricObj *quadric = gluNewQuadric();

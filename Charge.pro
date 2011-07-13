@@ -44,3 +44,8 @@ HEADERS  += \
     src/wglew.h \
     src/glxew.h \
     src/model.h
+
+OTHER_FILES += \
+    data/shaders/vertex/player.glsl \
+    data/shaders/fragment/player.glsl \
+    data/shaders/fragment/ambient.glsl
