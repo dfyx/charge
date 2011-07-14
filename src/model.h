@@ -16,7 +16,7 @@ namespace Charge
         };
 
         GLuint vertexBuffer, normalBuffer, texCoordBuffer, indexBuffer, numFaces;
-        QMap<QString, ModelInfo> cache;
+        static QMap<QString, ModelInfo> cache;
         QString filename;
 
         QMap<QString, GLuint> textures;

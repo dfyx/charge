@@ -4,6 +4,8 @@
 
 namespace Charge
 {
+    QMap<QString, Model::ModelInfo> Model::cache;
+
     Model::Model(QString filename)
     {
         this->filename = filename;
