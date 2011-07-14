@@ -55,4 +55,5 @@ OTHER_FILES += \
     data/shaders/vertex/light.glsl \
     data/shaders/vertex/default.glsl \
     data/shaders/fragment/default.glsl \
+    data/shaders/vertex/ambient.glsl \
     data/shaders/vertex/ambient.glsl
