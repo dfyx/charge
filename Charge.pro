@@ -29,7 +29,8 @@ SOURCES +=\
     src/chargeloader.cpp \
     src/objectloader.cpp \
     src/glew.cpp \
-    src/model.cpp
+    src/model.cpp \
+    src/light.cpp
 
 HEADERS  += \
     src/staticobstacle.h \
@@ -46,7 +47,8 @@ HEADERS  += \
     src/glew.h \
     src/wglew.h \
     src/glxew.h \
-    src/model.h
+    src/model.h \
+    src/light.h
 
 OTHER_FILES += \
     data/shaders/fragment/player.glsl \

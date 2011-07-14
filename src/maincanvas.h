@@ -9,6 +9,7 @@
 #include <QKeyEvent>
 #include "circularfield.h"
 #include "model.h"
+#include "light.h"
 
 namespace Charge
 {
@@ -24,11 +25,12 @@ namespace Charge
         Model *playerModel, *dynamicModel, *staticModel, *fieldModel;
         QGLShaderProgram *defaultShaderProgram, *playerShaderProgram, *lightShaderProgram, *ambientShaderProgram;
 
+        QList<Light> lights;
+
         // Buffers for deferred shading
         GLuint frameBuffer, depthBuffer, diffuseBuffer, specularBuffer, positionBuffer, normalBuffer;
 
         const static unsigned int TIMESTEP = 10;
-        const static float LIGHTTHRESHOLD = 0.05;
     public:
         explicit MainCanvas(CircularField *field, QWidget *parent = 0);
         ~MainCanvas();
@@ -43,12 +45,10 @@ namespace Charge
         void renderDynamic(class DynamicObstacle *obstacle);
 
         void drawCircle(b2Vec2 position, float radius, bool filled = false);
-        void setChargeColor(float charge);
+        QColor getChargeColor(float charge);
 
         void geometryRenderPass();
         void shadingRenderPass();
-
-        void renderLight(const QVector3D &pos, const QColor &color, float intensity);
 
         void setBufferUniforms(QGLShaderProgram *shaderProgram);
 

@@ -187,6 +187,7 @@ namespace Charge
 
     void MainCanvas::paintGL()
     {
+        lights.clear();
         geometryRenderPass();
 
         shadingRenderPass();
@@ -221,6 +222,9 @@ namespace Charge
         glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
         glLightfv(GL_LIGHT0, GL_DIFFUSE, specular);
         glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
+
+        // Add main light
+        lights.push_back(Light(QVector3D(0.0f, 1.0f, 0.0f), Qt::white, 0.5f));
 
         // Draw field
         glColor3f(0.1f, 0.1f, 0.1f);
@@ -261,6 +265,8 @@ namespace Charge
 
     void MainCanvas::shadingRenderPass()
     {
+        glPushAttrib(GL_ALL_ATTRIB_BITS);
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_TEXTURE_2D);
         glEnable(GL_DEPTH_TEST);
@@ -275,10 +281,20 @@ namespace Charge
         glActiveTexture(GL_TEXTURE3);
         glBindTexture(GL_TEXTURE_2D, normalBuffer);
 
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ONE);
+        glDepthMask(GL_FALSE);
+
         // Render lights
         lightShaderProgram->bind();
         setBufferUniforms(lightShaderProgram);
-        renderLight(QVector3D(0.0f, 1.0f, 0.0f), Qt::white, 0.5f);
+        lightShaderProgram->setUniformValue("screenSize", width(), height());
+
+        QList<Light>::iterator iter;
+        for(iter = lights.begin(); iter != lights.end(); iter++)
+        {
+            (*iter).draw(lightShaderProgram);
+        }
         lightShaderProgram->release();
 
         // Add ambient light
@@ -294,8 +310,6 @@ namespace Charge
         glLoadIdentity();
 
         glDisable(GL_DEPTH_TEST);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_ONE, GL_ONE);
         glBegin(GL_QUADS);
             glTexCoord2f(1.0f, 1.0f);
             glVertex3f(1.0f, 1.0f, 0.0f);
@@ -309,22 +323,8 @@ namespace Charge
         ambientShaderProgram->release();
 
         glBindTexture(GL_TEXTURE_2D, 0);
-    }
 
-    void MainCanvas::renderLight(const QVector3D &pos, const QColor &color, float intensity)
-    {
-        glPushMatrix();
-
-        glTranslatef(pos.x(), pos.y(), pos.z());
-        // Render lights
-        float radius = sqrt(intensity / LIGHTTHRESHOLD);
-        GLUquadricObj *quadric = gluNewQuadric();
-        gluQuadricDrawStyle(quadric, GLU_FILL);
-        lightShaderProgram->setUniformValue("lightColor", color.redF(), color.greenF(), color.blueF(), intensity);
-        lightShaderProgram->setUniformValue("screenSize", width(), height());
-        gluSphere(quadric, radius, 16, 8);
-
-        glPopMatrix();
+        glPopAttrib();
     }
 
     void MainCanvas::setBufferUniforms(QGLShaderProgram *shaderProgram)
@@ -349,6 +349,7 @@ namespace Charge
         glColor3fv(playerColors[player->getOwner()]);
         glPushMatrix();
         glTranslatef(player->getPosition().x, 0.0f, player->getPosition().y);
+
         float radius = player->getRadius();
         glScalef(radius, radius, radius);
 
@@ -356,7 +357,10 @@ namespace Charge
         playerModel->draw(playerShaderProgram);
         playerShaderProgram->release();
 
-        // Temporary charge indicator
+        // Charge light
+        lights.push_back(Light(QVector3D(0.0f, 1.5f, 0.0f), getChargeColor(player->getCharge()), fabs(player->getCharge())));
+
+        /*// Temporary charge indicator
         GLUquadricObj *quadric = gluNewQuadric();
         gluQuadricDrawStyle(quadric, GLU_FILL);
 
@@ -364,10 +368,9 @@ namespace Charge
         glPushAttrib(GL_ENABLE_BIT);
         glDisable(GL_LIGHTING);
         glTranslatef(0.0f, 1.5f, 0.0f);
-        setChargeColor(player->getCharge());
         gluSphere(quadric, 0.4, 16, 8);
         glPopAttrib();
-        gluDeleteQuadric(quadric);
+        gluDeleteQuadric(quadric);*/
         glPopMatrix();
     }
 
@@ -384,7 +387,10 @@ namespace Charge
 
         if(obstacle->getCharge() != 0)
         {
-            // Temporary charge indicator
+            // Charge light
+            lights.push_back(Light(QVector3D(0.0f, 1.5f, 0.0f), getChargeColor(obstacle->getCharge()), fabs(obstacle->getCharge())));
+
+            /*// Temporary charge indicator
             GLUquadricObj *quadric = gluNewQuadric();
             gluQuadricDrawStyle(quadric, GLU_FILL);
 
@@ -392,10 +398,9 @@ namespace Charge
             glPushAttrib(GL_ENABLE_BIT);
             glDisable(GL_LIGHTING);
             glTranslatef(0.0f, 1.5f, 0.0f);
-            setChargeColor(obstacle->getCharge());
-            gluSphere(quadric, obstacle->getCharge(), 16, 8);
+            gluSphere(quadric, fabs(obstacle->getCharge()), 16, 8);
             glPopAttrib();
-            gluDeleteQuadric(quadric);
+            gluDeleteQuadric(quadric);*/
         }
 
         glPopMatrix();
@@ -414,7 +419,10 @@ namespace Charge
 
         if(obstacle->getCharge() != 0)
         {
-            // Temporary charge indicator
+            // Charge light
+            lights.push_back(Light(QVector3D(0.0f, 1.5f, 0.0f), getChargeColor(obstacle->getCharge()), fabs(obstacle->getCharge())));
+
+            /*// Temporary charge indicator
             GLUquadricObj *quadric = gluNewQuadric();
             gluQuadricDrawStyle(quadric, GLU_FILL);
 
@@ -422,10 +430,9 @@ namespace Charge
             glPushAttrib(GL_ENABLE_BIT);
             glDisable(GL_LIGHTING);
             glTranslatef(0.0f, 1.5f, 0.0f);
-            setChargeColor(obstacle->getCharge());
-            gluSphere(quadric, obstacle->getCharge(), 16, 8);
+            gluSphere(quadric, fabs(obstacle->getCharge()), 16, 8);
             glPopAttrib();
-            gluDeleteQuadric(quadric);
+            gluDeleteQuadric(quadric);*/
         }
 
         glPopMatrix();
@@ -480,19 +487,22 @@ namespace Charge
         glPopMatrix();
     }
 
-    void MainCanvas::setChargeColor(float charge)
+    QColor MainCanvas::getChargeColor(float charge)
     {
+        QColor result;
         if(charge > 0)
         {
-            glColor3f(1.0f, 0.5f, 0.5f);
+            result.setRgbF(1.0f, 0.5f, 0.5f);
         }
         else if(charge < 0)
         {
-            glColor3f(0.5f, 0.5f, 1.0f);
+            result.setRgbF(0.5f, 0.5f, 1.0f);
         }
         else
         {
-            glColor3f(0.5f, 0.5f, 0.5f);
+            result.setRgbF(0.5f, 0.5f, 0.5f);
         }
+
+        return result;
     }
 }
