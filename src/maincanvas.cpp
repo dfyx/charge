@@ -31,6 +31,12 @@ namespace Charge
 
     MainCanvas::~MainCanvas()
     {
+        glDeleteTextures(1, &diffuseBuffer);
+        glDeleteTextures(1, &specularBuffer);
+        glDeleteTextures(1, &positionBuffer);
+        glDeleteTextures(1, &normalBuffer);
+        glDeleteRenderbuffers(1, &depthBuffer);
+        glDeleteFramebuffers(1, &frameBuffer);
         delete playerModel;
         delete fieldModel;
 
@@ -51,6 +57,8 @@ namespace Charge
 
         // Load models
         playerModel = new Model("data/models/player.obj");
+        playerModel->loadTexture("diffuseTexture", "data/textures/player/diffuse.png");
+        playerModel->loadTexture("specularTexture", "data/textures/player/specular.png");
         fieldModel = new Model("data/models/field.obj");
 
         // Load shaders
@@ -331,7 +339,7 @@ namespace Charge
         glScalef(radius, radius, radius);
 
         playerShaderProgram->bind();
-        playerModel->draw();
+        playerModel->draw(playerShaderProgram);
         playerShaderProgram->release();
 
         // Temporary charge indicator

@@ -4,6 +4,7 @@
 #include "glew.h"
 #include <QMap>
 #include <QString>
+#include <QGLShaderProgram>
 
 namespace Charge
 {
@@ -17,11 +18,15 @@ namespace Charge
         GLuint vertexBuffer, normalBuffer, texCoordBuffer, indexBuffer, numFaces;
         QMap<QString, ModelInfo> cache;
         QString filename;
+
+        QMap<QString, GLuint> textures;
     public:
         Model(QString filename);
         ~Model();
 
-        void draw();
+        void loadTexture(QString texname, QString filename);
+
+        void draw(QGLShaderProgram *shaderProgram = NULL);
     };
 }
 
