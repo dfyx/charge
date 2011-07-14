@@ -114,6 +114,13 @@ namespace Charge
 
     void MainCanvas::paintGL()
     {
+        geometryRenderPass();
+
+        shadingRenderPass();
+    }
+
+    void MainCanvas::geometryRenderPass()
+    {
         setupProjectionCamera(width(), height());
 
         glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
@@ -175,35 +182,37 @@ namespace Charge
         }
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    void MainCanvas::shadingRenderPass()
+    {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+
+        glEnable(GL_TEXTURE_2D);
+        ambientShaderProgram->bind();
+
+        // Bind buffers
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, diffuseBuffer);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, specularBuffer);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, positionBuffer);
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, normalBuffer);
+
+        // Add ambient light
+        setBufferUniforms(ambientShaderProgram);
+        ambientShaderProgram->setUniformValue("ambientColor", 1.0f, 1.0f, 1.0f, 1.0f);
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         glOrtho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-
-        glEnable(GL_TEXTURE_2D);
-        ambientShaderProgram->bind();
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, diffuseBuffer);
-        ambientShaderProgram->setUniformValue("diffuseBuffer", 0);
-
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, specularBuffer);
-        ambientShaderProgram->setUniformValue("specularBuffer", 1);
-
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, positionBuffer);
-        ambientShaderProgram->setUniformValue("positionBuffer", 2);
-
-        glActiveTexture(GL_TEXTURE3);
-        glBindTexture(GL_TEXTURE_2D, normalBuffer);
-        ambientShaderProgram->setUniformValue("normalBuffer", 3);
-
-        ambientShaderProgram->setUniformValue("ambientColor", 1.0f, 1.0f, 1.0f, 1.0f);
 
         glBegin(GL_QUADS);
             glTexCoord2f(1.0f, 1.0f);
@@ -218,6 +227,14 @@ namespace Charge
         ambientShaderProgram->release();
 
         glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    void MainCanvas::setBufferUniforms(QGLShaderProgram *shaderProgram)
+    {
+        shaderProgram->setUniformValue("diffuseBuffer", 0);
+        shaderProgram->setUniformValue("specularBuffer", 1);
+        shaderProgram->setUniformValue("positionBuffer", 2);
+        shaderProgram->setUniformValue("normalBuffer", 3);
     }
 
     void MainCanvas::updateScene()

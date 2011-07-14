@@ -28,8 +28,6 @@ namespace Charge
         GLuint frameBuffer, depthBuffer, diffuseBuffer, specularBuffer, positionBuffer, normalBuffer;
 
         const static unsigned int TIMESTEP = 10;
-
-        void setupProjectionCamera(int width, int height);
     public:
         explicit MainCanvas(CircularField *field, QWidget *parent = 0);
         ~MainCanvas();
@@ -45,6 +43,13 @@ namespace Charge
 
         void drawCircle(b2Vec2 position, float radius, bool filled = false);
         void setChargeColor(float charge);
+
+        void geometryRenderPass();
+        void shadingRenderPass();
+
+        void setBufferUniforms(QGLShaderProgram *shaderProgram);
+
+        void setupProjectionCamera(int width, int height);
 
     signals:
 
