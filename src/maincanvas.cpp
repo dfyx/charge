@@ -8,12 +8,12 @@
 
 using namespace std;
 
-static float playerColors[][3] =
-{{0.5f, 0.5f, 0.5f},
- {1.0f, 0.0f, 0.0f},
- {0.0f, 0.0f, 1.0f},
- {0.0f, 1.0f, 0.0f},
- {1.0f, 1.0f, 0.0f}};
+static QColor playerColors[] =
+{QColor(128, 128, 128),
+ QColor(255, 0,   0  ),
+ QColor(0,   0,   255),
+ QColor(0,   255, 0  ),
+ QColor(255, 255, 0  )};
 
 namespace Charge
 {
@@ -62,18 +62,19 @@ namespace Charge
         playerModel = new Model("data/models/player.obj");
         playerModel->loadTexture("diffuseTexture", "data/textures/player/diffuse.png");
         playerModel->loadTexture("specularTexture", "data/textures/player/specular.png");
+        playerModel->loadTexture("identifierTexture", "data/textures/player/identifier.png");
 
         dynamicModel = new Model("data/models/dynamic.obj");
         dynamicModel->loadTexture("diffuseTexture", "data/textures/dynamic/diffuse.png");
-        dynamicModel->loadTexture("diffuseTexture", "data/textures/dynamic/specular.png");
+        dynamicModel->loadTexture("specularTexture", "data/textures/dynamic/specular.png");
 
         staticModel = new Model("data/models/static.obj");
         staticModel->loadTexture("diffuseTexture", "data/textures/static/diffuse.png");
-        staticModel->loadTexture("diffuseTexture", "data/textures/static/specular.png");
+        staticModel->loadTexture("specularTexture", "data/textures/static/specular.png");
 
         fieldModel = new Model("data/models/field.obj");
         fieldModel->loadTexture("diffuseTexture", "data/textures/field/diffuse.png");
-        fieldModel->loadTexture("diffuseTexture", "data/textures/field/specular.png");
+        fieldModel->loadTexture("specularTexture", "data/textures/field/specular.png");
 
         // Load shaders
         defaultShaderProgram = new QGLShaderProgram(context());
@@ -343,7 +344,6 @@ namespace Charge
         //setChargeColor(player->getCharge());
         //drawCircle(player->getPosition(), player->getRadius());
 
-        glColor3fv(playerColors[player->getOwner()]);
         glPushMatrix();
         glTranslatef(player->getPosition().x, 0.0f, player->getPosition().y);
 
@@ -351,6 +351,8 @@ namespace Charge
         glScalef(radius, radius, radius);
 
         playerShaderProgram->bind();
+        QColor playerColor = playerColors[player->getOwner()];
+        playerShaderProgram->setUniformValue("playerColor", playerColor.redF(), playerColor.greenF(), playerColor.blueF());
         playerModel->draw(playerShaderProgram);
         playerShaderProgram->release();
 
