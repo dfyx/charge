@@ -102,19 +102,20 @@ namespace Charge
         glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, indexBuffer);
 
         // Enable textures
-        unsigned int num = 0;
-        QMap<QString, GLuint>::iterator iter;
-        for(iter = textures.begin(); iter != textures.end(); iter++)
+        if(shaderProgram)
         {
-            GLuint id = iter.value();
-            QString texname = iter.key();
-            glActiveTexture(GL_TEXTURE0 + num);
-            glBindTexture(GL_TEXTURE_2D, id);
-            if(shaderProgram)
+            unsigned int num = 0;
+            QMap<QString, GLuint>::iterator iter;
+            for(iter = textures.begin(); iter != textures.end(); iter++)
             {
+                GLuint id = iter.value();
+                QString texname = iter.key();
+                glActiveTexture(GL_TEXTURE0 + num);
+                glBindTexture(GL_TEXTURE_2D, id);
+
                 shaderProgram->setUniformValue((const char*) texname.data(), num);
+                num++;
             }
-            num++;
         }
 
         // Draw
@@ -124,10 +125,13 @@ namespace Charge
         glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
         glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 
-        for(int i = 0; i < textures.size(); i++)
+        if(shaderProgram)
         {
-            glActiveTexture(GL_TEXTURE0 + num);
-            glBindTexture(GL_TEXTURE_2D, 0);
+            for(int i = 0; i < textures.size(); i++)
+            {
+                glActiveTexture(GL_TEXTURE0 + i);
+                glBindTexture(GL_TEXTURE_2D, 0);
+            }
         }
 
         glPopClientAttrib();
