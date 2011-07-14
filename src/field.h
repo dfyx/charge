@@ -2,7 +2,7 @@
 #define CHARGE_FIELD_H
 
 #include "actor.h"
-#include <vector>
+#include <QList>
 #include <Box2D/Box2D.h>
 
 namespace Charge
@@ -10,14 +10,14 @@ namespace Charge
     class Field
     {
     private:
-        std::vector<class Actor*> actors;
+        QList<class Actor*> actors;
         b2World *world;
         bool cleanup;
     public:
         Field();
         ~Field();
         void addActor(class Actor* actor);
-        const std::vector<class Actor*> getActors() const;
+        const QList<class Actor*> getActors() const;
 
         void step(float timestep);
         void reactToPlayer(unsigned int id);

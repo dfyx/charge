@@ -1,7 +1,5 @@
 #include "field.h"
 
-using namespace std;
-
 namespace Charge
 {
     Field::Field()
@@ -15,7 +13,7 @@ namespace Charge
         delete world;
         if(cleanup)
         {
-            vector<Actor*>::iterator iter;
+            QList<Actor*>::iterator iter;
             for(iter = actors.begin(); iter != actors.end(); iter++)
             {
                 delete *iter;
@@ -33,7 +31,7 @@ namespace Charge
         actor->body = body;
     }
 
-    const vector<Actor*> Field::getActors() const
+    const QList<Actor*> Field::getActors() const
     {
         return actors;
     }
@@ -41,11 +39,11 @@ namespace Charge
     void Field::step(float timestep)
     {
         // Calculate forces caused by electric charge
-        vector<Actor*>::iterator iter1;
+        QList<Actor*>::iterator iter1;
         for(iter1 = actors.begin(); iter1 != actors.end(); iter1++)
         {
             Actor* actor1 = *iter1;
-            vector<Actor*>::iterator iter2;
+            QList<Actor*>::iterator iter2;
 
             for(iter2 = actors.begin(); iter2 != iter1; iter2++){
                 Actor* actor2 = *iter2;
@@ -60,13 +58,23 @@ namespace Charge
             }
         }
 
+        // Check for actors that left the field
+        for(int i = actors.size() - 1; i >= 0; i--)
+        {
+            if(!containsActor(actors[i]))
+            {
+                delete actors[i];
+                actors.removeAt(i);
+            }
+        }
+
         world->Step(timestep, 5, 5);
         world->ClearForces();
     }
 
     void Field::reactToPlayer(unsigned int id)
     {
-        vector<Actor*>::iterator iter;
+        QList<Actor*>::iterator iter;
         for(iter = actors.begin(); iter != actors.end(); iter++)
         {
             (*iter)->reactToPlayer(id);

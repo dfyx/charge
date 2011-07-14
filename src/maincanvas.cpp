@@ -240,8 +240,8 @@ namespace Charge
         drawCircle(b2Vec2(0.0f, 0.0f), field->getRadius());
 
         // Draw actors
-        vector<Actor*> actors = field->getActors();
-        vector<Actor*>::iterator iter;
+        QList<Actor*> actors = field->getActors();
+        QList<Actor*>::iterator iter;
         for(iter = actors.begin(); iter != actors.end(); iter++)
         {
             switch((*iter)->getType())
