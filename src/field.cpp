@@ -26,8 +26,10 @@ namespace Charge
     void Field::addActor(Actor* actor)
     {
         actors.push_back(actor);
-        b2Body *body = world->CreateBody(&actor->getBodyDef());
-        body->CreateFixture(&actor->getShape(), 0.5f);
+        const b2BodyDef &bodyDef = actor->getBodyDef();
+        b2Body *body = world->CreateBody(&bodyDef);
+        const b2Shape &shape = actor->getShape();
+        body->CreateFixture(&shape, 0.5f);
         actor->body = body;
     }
 

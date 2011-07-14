@@ -3,6 +3,7 @@
 
 #include "field.h"
 #include <Box2D/Box2D.h>
+#include <Qt>
 
 namespace Charge
 {
@@ -33,7 +34,7 @@ namespace Charge
         const b2BodyDef getBodyDef() const;
         const b2CircleShape getShape() const;
 
-        virtual void reactToPlayer(unsigned int id) {};
+        virtual void reactToPlayer(unsigned int id) {Q_UNUSED(id)};
 
         virtual const ActorType getType() const;
     };

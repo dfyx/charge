@@ -196,6 +196,8 @@ namespace Charge
                 case TYPE_DYNAMIC:
                     renderDynamic((DynamicObstacle*) *iter);
                     break;
+                default:
+                    break;
             }
         }
 
@@ -252,6 +254,7 @@ namespace Charge
 
     void MainCanvas::renderLight(const QVector3D &pos, const QColor &color, float intensity)
     {
+        Q_UNUSED(pos);
         // Render lights
         float radius = sqrt(intensity / LIGHTTHRESHOLD);
         GLUquadricObj *quadric = gluNewQuadric();
