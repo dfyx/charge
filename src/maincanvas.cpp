@@ -53,6 +53,11 @@ namespace Charge
         playerShaderProgram->addShaderFromSourceFile(QGLShader::Fragment, "data/shaders/fragment/player.glsl");
         playerShaderProgram->link();
 
+        lightShaderProgram = new QGLShaderProgram(context());
+        lightShaderProgram->addShaderFromSourceFile(QGLShader::Vertex, "data/shaders/vertex/light.glsl");
+        lightShaderProgram->addShaderFromSourceFile(QGLShader::Fragment, "data/shaders/fragment/light.glsl");
+        lightShaderProgram->link();
+
         ambientShaderProgram = new QGLShaderProgram(context());
         ambientShaderProgram->addShaderFromSourceFile(QGLShader::Vertex, "data/shaders/vertex/player.glsl");
         ambientShaderProgram->addShaderFromSourceFile(QGLShader::Fragment, "data/shaders/fragment/ambient.glsl");
@@ -187,11 +192,7 @@ namespace Charge
     void MainCanvas::shadingRenderPass()
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
-
         glEnable(GL_TEXTURE_2D);
-        ambientShaderProgram->bind();
 
         // Bind buffers
         glActiveTexture(GL_TEXTURE0);
@@ -203,7 +204,16 @@ namespace Charge
         glActiveTexture(GL_TEXTURE3);
         glBindTexture(GL_TEXTURE_2D, normalBuffer);
 
+        // Render lights
+        lightShaderProgram->bind();
+        setBufferUniforms(lightShaderProgram);
+        renderLight(QVector3D(), Qt::white, 1.0f);
+        lightShaderProgram->release();
+
+        return;
+
         // Add ambient light
+        ambientShaderProgram->bind();
         setBufferUniforms(ambientShaderProgram);
         ambientShaderProgram->setUniformValue("ambientColor", 1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -227,6 +237,15 @@ namespace Charge
         ambientShaderProgram->release();
 
         glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    void MainCanvas::renderLight(const QVector3D &pos, const QColor &color, float intensity)
+    {
+        // Render lights
+        GLUquadricObj *quadric = gluNewQuadric();
+        gluQuadricDrawStyle(quadric, GLU_FILL);
+        lightShaderProgram->setUniformValue("lightColor", 1.0f, 0.0f, 0.0f, 1.0f);
+        gluSphere(quadric, intensity, 16, 8);
     }
 
     void MainCanvas::setBufferUniforms(QGLShaderProgram *shaderProgram)

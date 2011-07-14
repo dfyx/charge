@@ -22,7 +22,7 @@ namespace Charge
         QTime *cameraTimer;
 
         Model *playerModel;
-        QGLShaderProgram *playerShaderProgram, *ambientShaderProgram;
+        QGLShaderProgram *playerShaderProgram, *lightShaderProgram, *ambientShaderProgram;
 
         // Buffers for deferred shading
         GLuint frameBuffer, depthBuffer, diffuseBuffer, specularBuffer, positionBuffer, normalBuffer;
@@ -46,6 +46,8 @@ namespace Charge
 
         void geometryRenderPass();
         void shadingRenderPass();
+
+        void renderLight(const QVector3D &pos, const QColor &color, float intensity);
 
         void setBufferUniforms(QGLShaderProgram *shaderProgram);
 
