@@ -31,8 +31,13 @@ namespace Charge
     MainCanvas::~MainCanvas()
     {
         delete playerModel;
+        delete fieldModel;
+
+        delete defaultShaderProgram;
         delete playerShaderProgram;
+        delete lightShaderProgram;
         delete ambientShaderProgram;
+
         delete timer;
     }
 
@@ -47,9 +52,18 @@ namespace Charge
 
         glewInit();
 
+        // Load models
         playerModel = new Model("data/models/player.obj");
+        fieldModel = new Model("data/models/field.obj");
+
+        // Load shaders
+        defaultShaderProgram = new QGLShaderProgram(context());
+        defaultShaderProgram->addShaderFromSourceFile(QGLShader::Vertex, "data/shaders/vertex/default.glsl");
+        defaultShaderProgram->addShaderFromSourceFile(QGLShader::Fragment, "data/shaders/fragment/default.glsl");
+        defaultShaderProgram->link();
+
         playerShaderProgram = new QGLShaderProgram(context());
-        playerShaderProgram->addShaderFromSourceFile(QGLShader::Vertex, "data/shaders/vertex/player.glsl");
+        playerShaderProgram->addShaderFromSourceFile(QGLShader::Vertex, "data/shaders/vertex/default.glsl");
         playerShaderProgram->addShaderFromSourceFile(QGLShader::Fragment, "data/shaders/fragment/player.glsl");
         playerShaderProgram->link();
 
@@ -59,7 +73,7 @@ namespace Charge
         lightShaderProgram->link();
 
         ambientShaderProgram = new QGLShaderProgram(context());
-        ambientShaderProgram->addShaderFromSourceFile(QGLShader::Vertex, "data/shaders/vertex/player.glsl");
+        ambientShaderProgram->addShaderFromSourceFile(QGLShader::Vertex, "data/shaders/vertex/default.glsl");
         ambientShaderProgram->addShaderFromSourceFile(QGLShader::Fragment, "data/shaders/fragment/ambient.glsl");
         ambientShaderProgram->link();
 
@@ -155,13 +169,12 @@ namespace Charge
 
         // Draw field
         glColor3f(0.1f, 0.1f, 0.1f);
-        GLUquadricObj *quadric = gluNewQuadric();
-        gluQuadricDrawStyle(quadric, GLU_FILL);
 
         glPushMatrix();
-        glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
-        gluCylinder(quadric, field->getRadius() * 1.1f, field->getRadius() * 1.1f, 4.0f, 40, 1);
-        gluDisk(quadric, 0.0f, field->getRadius() * 1.1f, 40, 1);
+        glScalef(field->getRadius() * 1.1f, field->getRadius() * 1.1f, field->getRadius() * 1.1f);
+        defaultShaderProgram->bind();
+        fieldModel->draw();
+        defaultShaderProgram->release();
         glPopMatrix();
 
         glColor3f(1.0f, 1.0f, 1.0f);
@@ -205,12 +218,10 @@ namespace Charge
         glBindTexture(GL_TEXTURE_2D, normalBuffer);
 
         // Render lights
-        lightShaderProgram->bind();
+        /*lightShaderProgram->bind();
         setBufferUniforms(lightShaderProgram);
         renderLight(QVector3D(), Qt::white, 1.0f);
-        lightShaderProgram->release();
-
-        return;
+        lightShaderProgram->release();*/
 
         // Add ambient light
         ambientShaderProgram->bind();
@@ -242,10 +253,11 @@ namespace Charge
     void MainCanvas::renderLight(const QVector3D &pos, const QColor &color, float intensity)
     {
         // Render lights
+        float radius = sqrt(intensity / LIGHTTHRESHOLD);
         GLUquadricObj *quadric = gluNewQuadric();
         gluQuadricDrawStyle(quadric, GLU_FILL);
-        lightShaderProgram->setUniformValue("lightColor", 1.0f, 0.0f, 0.0f, 1.0f);
-        gluSphere(quadric, intensity, 16, 8);
+        lightShaderProgram->setUniformValue("lightColor", color.redF(), color.greenF(), color.blueF(), intensity);
+        gluSphere(quadric, radius, 16, 8);
     }
 
     void MainCanvas::setBufferUniforms(QGLShaderProgram *shaderProgram)

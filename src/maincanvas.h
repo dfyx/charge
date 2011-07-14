@@ -21,13 +21,14 @@ namespace Charge
         QTimer *timer;
         QTime *cameraTimer;
 
-        Model *playerModel;
-        QGLShaderProgram *playerShaderProgram, *lightShaderProgram, *ambientShaderProgram;
+        Model *playerModel, *fieldModel;
+        QGLShaderProgram *defaultShaderProgram, *playerShaderProgram, *lightShaderProgram, *ambientShaderProgram;
 
         // Buffers for deferred shading
         GLuint frameBuffer, depthBuffer, diffuseBuffer, specularBuffer, positionBuffer, normalBuffer;
 
         const static unsigned int TIMESTEP = 10;
+        const static float LIGHTTHRESHOLD = 0.1f;
     public:
         explicit MainCanvas(CircularField *field, QWidget *parent = 0);
         ~MainCanvas();

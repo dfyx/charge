@@ -46,8 +46,9 @@ HEADERS  += \
     src/model.h
 
 OTHER_FILES += \
-    data/shaders/vertex/player.glsl \
     data/shaders/fragment/player.glsl \
     data/shaders/fragment/ambient.glsl \
     data/shaders/fragment/light.glsl \
-    data/shaders/vertex/light.glsl
+    data/shaders/vertex/light.glsl \
+    data/shaders/vertex/default.glsl \
+    data/shaders/fragment/default.glsl
