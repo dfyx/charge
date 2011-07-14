@@ -230,14 +230,11 @@ namespace Charge
         glColor3f(0.1f, 0.1f, 0.1f);
 
         glPushMatrix();
-        glScalef(field->getRadius() * 1.1f, field->getRadius() * 1.1f, field->getRadius() * 1.1f);
+        glScalef(field->getRadius(), field->getRadius(), field->getRadius());
         defaultShaderProgram->bind();
         fieldModel->draw(defaultShaderProgram);
         defaultShaderProgram->release();
         glPopMatrix();
-
-        glColor3f(1.0f, 1.0f, 1.0f);
-        drawCircle(b2Vec2(0.0f, 0.0f), field->getRadius());
 
         // Draw actors
         QList<Actor*> actors = field->getActors();
