@@ -12,6 +12,9 @@ TEMPLATE = app
 LIBS += -lBox2D
 DEFINES += GLEW_STATIC
 
+QMAKE_POST_LINK = cp -r \"$$PWD/data\" \"$$OUT_PWD\";
+macx:debug:QMAKE_POST_LINK += cp -r \"$$PWD/data\" \"$$OUT_PWD/$${TARGET}.app/Contents/MacOS\";
+
 SOURCES +=\
     src/staticobstacle.cpp \
     src/player.cpp \
@@ -51,4 +54,5 @@ OTHER_FILES += \
     data/shaders/fragment/light.glsl \
     data/shaders/vertex/light.glsl \
     data/shaders/vertex/default.glsl \
-    data/shaders/fragment/default.glsl
+    data/shaders/fragment/default.glsl \
+    data/shaders/vertex/ambient.glsl

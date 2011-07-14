@@ -2,6 +2,7 @@
 #include "player.h"
 #include "dynamicobstacle.h"
 #include "staticobstacle.h"
+#include <QMessageBox>
 
 #include <vector>
 
@@ -43,10 +44,6 @@ namespace Charge
 
     void MainCanvas::initializeGL()
     {
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    #ifdef GL_MULTISAMLE
-        glEnable(GL_MULTISAMPLE);
-    #endif
         timer->start(TIMESTEP);
         cameraTimer->start();
 
@@ -73,46 +70,80 @@ namespace Charge
         lightShaderProgram->link();
 
         ambientShaderProgram = new QGLShaderProgram(context());
-        ambientShaderProgram->addShaderFromSourceFile(QGLShader::Vertex, "data/shaders/vertex/default.glsl");
+        ambientShaderProgram->addShaderFromSourceFile(QGLShader::Vertex, "data/shaders/vertex/ambient.glsl");
         ambientShaderProgram->addShaderFromSourceFile(QGLShader::Fragment, "data/shaders/fragment/ambient.glsl");
         ambientShaderProgram->link();
 
         // Setup the frame buffer
         glGenFramebuffers(1, &frameBuffer);
+        glGenRenderbuffers(1, &depthBuffer);
+        glGenTextures(1, &diffuseBuffer);
+        glGenTextures(1, &specularBuffer);
+        glGenTextures(1, &positionBuffer);
+        glGenTextures(1, &normalBuffer);
+
+        setupFrameBuffer();
+    }
+
+    void MainCanvas::setupFrameBuffer()
+    {
         glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 
         // Add depth buffer
-        glGenRenderbuffers(1, &depthBuffer);
         glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width(), height());
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
         // Setup diffuse buffer
-        glGenTextures(1, &diffuseBuffer);
         glBindTexture(GL_TEXTURE_2D, diffuseBuffer);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width(), height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, diffuseBuffer, 0);
 
         // Setup specular buffer
-        glGenTextures(1, &specularBuffer);
         glBindTexture(GL_TEXTURE_2D, specularBuffer);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width(), height(), 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, specularBuffer, 0);
 
         // Setup position buffer
         glGenTextures(1, &positionBuffer);
         glBindTexture(GL_TEXTURE_2D, positionBuffer);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width(), height(), 0, GL_RGB, GL_FLOAT, NULL);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width(), height(), 0, GL_RGBA, GL_FLOAT, NULL);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, positionBuffer, 0);
 
         // Setup normal buffer
         glGenTextures(1, &normalBuffer);
         glBindTexture(GL_TEXTURE_2D, normalBuffer);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width(), height(), 0, GL_RGB, GL_FLOAT, NULL);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, normalBuffer, 0);
+        glBindTexture(GL_TEXTURE_2D, 0);
 
         GLenum drawBuffers[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
         glDrawBuffers(4, drawBuffers);
+
+        if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        {
+            QMessageBox msgBox;
+            msgBox.setWindowTitle("Frame buffer error");
+            msgBox.setText("Could not initialize frame buffer");
+            msgBox.exec();
+        }
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
@@ -129,6 +160,7 @@ namespace Charge
         glViewport(0, 0, width, height);
 
         setupProjectionCamera(width, height);
+        setupFrameBuffer();
     }
 
     void MainCanvas::paintGL()
@@ -144,6 +176,7 @@ namespace Charge
 
         glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
@@ -191,10 +224,10 @@ namespace Charge
                     renderPlayer((Player*) *iter);
                     break;
                 case TYPE_STATIC:
-                    renderStatic((StaticObstacle*) *iter);
+                    //renderStatic((StaticObstacle*) *iter);
                     break;
                 case TYPE_DYNAMIC:
-                    renderDynamic((DynamicObstacle*) *iter);
+                    //renderDynamic((DynamicObstacle*) *iter);
                     break;
                 default:
                     break;
@@ -208,6 +241,7 @@ namespace Charge
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_TEXTURE_2D);
+        glEnable(GL_DEPTH_TEST);
 
         // Bind buffers
         glActiveTexture(GL_TEXTURE0);
@@ -220,15 +254,15 @@ namespace Charge
         glBindTexture(GL_TEXTURE_2D, normalBuffer);
 
         // Render lights
-        /*lightShaderProgram->bind();
+        lightShaderProgram->bind();
         setBufferUniforms(lightShaderProgram);
-        renderLight(QVector3D(), Qt::white, 1.0f);
-        lightShaderProgram->release();*/
+        renderLight(QVector3D(0.0f, 1.0f, 0.0f), Qt::white, 0.5f);
+        lightShaderProgram->release();
 
         // Add ambient light
         ambientShaderProgram->bind();
         setBufferUniforms(ambientShaderProgram);
-        ambientShaderProgram->setUniformValue("ambientColor", 1.0f, 1.0f, 1.0f, 1.0f);
+        ambientShaderProgram->setUniformValue("ambientColor", 0.05f, 0.05f, 0.05f, 1.0f);
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
@@ -237,6 +271,9 @@ namespace Charge
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
 
+        glDisable(GL_DEPTH_TEST);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ONE);
         glBegin(GL_QUADS);
             glTexCoord2f(1.0f, 1.0f);
             glVertex3f(1.0f, 1.0f, 0.0f);
@@ -254,13 +291,18 @@ namespace Charge
 
     void MainCanvas::renderLight(const QVector3D &pos, const QColor &color, float intensity)
     {
-        Q_UNUSED(pos);
+        glPushMatrix();
+
+        glTranslatef(pos.x(), pos.y(), pos.z());
         // Render lights
         float radius = sqrt(intensity / LIGHTTHRESHOLD);
         GLUquadricObj *quadric = gluNewQuadric();
         gluQuadricDrawStyle(quadric, GLU_FILL);
         lightShaderProgram->setUniformValue("lightColor", color.redF(), color.greenF(), color.blueF(), intensity);
+        lightShaderProgram->setUniformValue("screenSize", width(), height());
         gluSphere(quadric, radius, 16, 8);
+
+        glPopMatrix();
     }
 
     void MainCanvas::setBufferUniforms(QGLShaderProgram *shaderProgram)
@@ -340,9 +382,6 @@ namespace Charge
 
         if(filled)
         {
-    #ifdef GL_MULTISAMPLE
-            glEnable(GL_MULTISAMPLE);
-    #endif
             glBegin(GL_POLYGON);
         }
         else
@@ -361,9 +400,6 @@ namespace Charge
 
         if(filled)
         {
-    #ifdef GL_MULTISAMPLE
-            glDisable(GL_MULTISAMPLE);
-    #endif
         }
         else
         {

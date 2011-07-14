@@ -28,7 +28,7 @@ namespace Charge
         GLuint frameBuffer, depthBuffer, diffuseBuffer, specularBuffer, positionBuffer, normalBuffer;
 
         const static unsigned int TIMESTEP = 10;
-        const static float LIGHTTHRESHOLD = 0.1f;
+        const static float LIGHTTHRESHOLD = 0.05;
     public:
         explicit MainCanvas(CircularField *field, QWidget *parent = 0);
         ~MainCanvas();
@@ -53,6 +53,7 @@ namespace Charge
         void setBufferUniforms(QGLShaderProgram *shaderProgram);
 
         void setupProjectionCamera(int width, int height);
+        void setupFrameBuffer();
 
     signals:
 

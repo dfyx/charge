@@ -3,5 +3,5 @@ uniform vec4 ambientColor;
 
 void main()
 {
-    gl_FragColor = ambientColor * texture2D(diffuseBuffer, gl_TexCoord[0].st);
+    gl_FragColor = texture2D(diffuseBuffer, gl_TexCoord[0].st) * ambientColor;
 }
