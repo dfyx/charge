@@ -72,6 +72,8 @@ namespace Charge
         staticModel->loadTexture("diffuseTexture", "data/textures/static/specular.png");
 
         fieldModel = new Model("data/models/field.obj");
+        fieldModel->loadTexture("diffuseTexture", "data/textures/field/diffuse.png");
+        fieldModel->loadTexture("diffuseTexture", "data/textures/field/specular.png");
 
         // Load shaders
         defaultShaderProgram = new QGLShaderProgram(context());
@@ -226,7 +228,7 @@ namespace Charge
         glPushMatrix();
         glScalef(field->getRadius() * 1.1f, field->getRadius() * 1.1f, field->getRadius() * 1.1f);
         defaultShaderProgram->bind();
-        fieldModel->draw();
+        fieldModel->draw(defaultShaderProgram);
         defaultShaderProgram->release();
         glPopMatrix();
 
