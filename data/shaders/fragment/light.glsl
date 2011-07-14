@@ -40,7 +40,7 @@ void main()
     vec3 lightDir = normalize(vec3(lightPos - position));
     vec3 eyeDir = normalize(vec3(-position));
 
-    vec4 diff = position - lightPos;
+    vec4 diff = gl_ModelViewMatrixInverse * (position - lightPos);
     float distSquared = dot(diff, diff);
     gl_FragColor = phongColor(normal, lightDir, eyeDir,
         vec4(0.0), diffuse, specular, 100.0) * lightColor * lightColor.a / distSquared;
