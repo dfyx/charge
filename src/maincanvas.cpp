@@ -37,7 +37,10 @@ namespace Charge
         glDeleteTextures(1, &normalBuffer);
         glDeleteRenderbuffers(1, &depthBuffer);
         glDeleteFramebuffers(1, &frameBuffer);
+
         delete playerModel;
+        delete dynamicModel;
+        delete staticModel;
         delete fieldModel;
 
         delete defaultShaderProgram;
@@ -59,6 +62,15 @@ namespace Charge
         playerModel = new Model("data/models/player.obj");
         playerModel->loadTexture("diffuseTexture", "data/textures/player/diffuse.png");
         playerModel->loadTexture("specularTexture", "data/textures/player/specular.png");
+
+        dynamicModel = new Model("data/models/dynamic.obj");
+        dynamicModel->loadTexture("diffuseTexture", "data/textures/dynamic/diffuse.png");
+        dynamicModel->loadTexture("diffuseTexture", "data/textures/dynamic/specular.png");
+
+        staticModel = new Model("data/models/static.obj");
+        staticModel->loadTexture("diffuseTexture", "data/textures/static/diffuse.png");
+        staticModel->loadTexture("diffuseTexture", "data/textures/static/specular.png");
+
         fieldModel = new Model("data/models/field.obj");
 
         // Load shaders
@@ -232,10 +244,10 @@ namespace Charge
                     renderPlayer((Player*) *iter);
                     break;
                 case TYPE_STATIC:
-                    //renderStatic((StaticObstacle*) *iter);
+                    renderStatic((StaticObstacle*) *iter);
                     break;
                 case TYPE_DYNAMIC:
-                    //renderDynamic((DynamicObstacle*) *iter);
+                    renderDynamic((DynamicObstacle*) *iter);
                     break;
                 default:
                     break;
@@ -357,16 +369,64 @@ namespace Charge
         glPopMatrix();
     }
 
-    void MainCanvas::renderStatic(StaticObstacle *obstacle)
-    {
-        setChargeColor(obstacle->getCharge());
-        drawCircle(obstacle->getPosition(), obstacle->getRadius(), true);
-    }
-
     void MainCanvas::renderDynamic(DynamicObstacle *obstacle)
     {
-        setChargeColor(obstacle->getCharge());
-        drawCircle(obstacle->getPosition(), obstacle->getRadius());
+        glPushMatrix();
+        glTranslatef(obstacle->getPosition().x, 0.0f, obstacle->getPosition().y);
+        float radius = obstacle->getRadius();
+        glScalef(radius, radius, radius);
+
+        defaultShaderProgram->bind();
+        dynamicModel->draw(defaultShaderProgram);
+        defaultShaderProgram->release();
+
+        if(obstacle->getCharge() != 0)
+        {
+            // Temporary charge indicator
+            GLUquadricObj *quadric = gluNewQuadric();
+            gluQuadricDrawStyle(quadric, GLU_FILL);
+
+            // Double tessellation for slices or it would look really ugly
+            glPushAttrib(GL_ENABLE_BIT);
+            glDisable(GL_LIGHTING);
+            glTranslatef(0.0f, 1.5f, 0.0f);
+            setChargeColor(obstacle->getCharge());
+            gluSphere(quadric, obstacle->getCharge(), 16, 8);
+            glPopAttrib();
+            gluDeleteQuadric(quadric);
+        }
+
+        glPopMatrix();
+    }
+
+    void MainCanvas::renderStatic(StaticObstacle *obstacle)
+    {
+        glPushMatrix();
+        glTranslatef(obstacle->getPosition().x, 0.0f, obstacle->getPosition().y);
+        float radius = obstacle->getRadius();
+        glScalef(radius, radius, radius);
+
+        defaultShaderProgram->bind();
+        staticModel->draw(defaultShaderProgram);
+        defaultShaderProgram->release();
+
+        if(obstacle->getCharge() != 0)
+        {
+            // Temporary charge indicator
+            GLUquadricObj *quadric = gluNewQuadric();
+            gluQuadricDrawStyle(quadric, GLU_FILL);
+
+            // Double tessellation for slices or it would look really ugly
+            glPushAttrib(GL_ENABLE_BIT);
+            glDisable(GL_LIGHTING);
+            glTranslatef(0.0f, 1.5f, 0.0f);
+            setChargeColor(obstacle->getCharge());
+            gluSphere(quadric, obstacle->getCharge(), 16, 8);
+            glPopAttrib();
+            gluDeleteQuadric(quadric);
+        }
+
+        glPopMatrix();
     }
 
     void MainCanvas::drawCircle(b2Vec2 position, float radius, bool filled)

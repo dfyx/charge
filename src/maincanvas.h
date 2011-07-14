@@ -21,7 +21,7 @@ namespace Charge
         QTimer *timer;
         QTime *cameraTimer;
 
-        Model *playerModel, *fieldModel;
+        Model *playerModel, *dynamicModel, *staticModel, *fieldModel;
         QGLShaderProgram *defaultShaderProgram, *playerShaderProgram, *lightShaderProgram, *ambientShaderProgram;
 
         // Buffers for deferred shading
