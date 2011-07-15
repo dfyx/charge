@@ -1,4 +1,8 @@
 #include "field.h"
+#include "player.h"
+#include <QMessageBox>
+
+using namespace std;
 
 namespace Charge
 {
@@ -58,6 +62,8 @@ namespace Charge
             }
         }
 
+        unsigned int playerCount[] = {0, 0, 0}; // 0 is neutral player
+
         // Check for actors that left the field
         for(int i = actors.size() - 1; i >= 0; i--)
         {
@@ -65,7 +71,31 @@ namespace Charge
             {
                 delete actors[i];
                 actors.removeAt(i);
+                continue;
             }
+
+            if(actors[i]->getType() == TYPE_PLAYER)
+            {
+                Player *player = (Player*) actors[i];
+                playerCount[player->getOwner()]++;
+            }
+        }
+
+        if(playerCount[1] == 0)
+        {
+            QMessageBox msgBox;
+            msgBox.setWindowTitle("Game Over");
+            msgBox.setText("Blue player wins");
+            msgBox.exec();
+            exit(0);
+        }
+        else if(playerCount[2] == 0)
+        {
+            QMessageBox msgBox;
+            msgBox.setWindowTitle("Game Over");
+            msgBox.setText("Red player wins");
+            msgBox.exec();
+            exit(0);
         }
 
         world->Step(timestep, 5, 5);
