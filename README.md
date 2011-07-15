@@ -8,6 +8,7 @@ to push the other player off the platform by inverting your token's
 charge at the right moment.
 
 There are three kinds of objects:
+
 * Player's token: large black object with claws and player color markers
 * Movable obstacle: flat dish
 * Fixed obstacle: flat disk with claws
