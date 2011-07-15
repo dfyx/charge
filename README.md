@@ -18,8 +18,8 @@ change as soon as I have time to create better textures.
 
 Controls
 --------
-A - Invert red player's charge
-B - Invert blue player's charge
+* A - Invert red player's charge
+* L - Invert blue player's charge
 
 Features
 --------
