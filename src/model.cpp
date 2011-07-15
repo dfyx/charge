@@ -1,6 +1,7 @@
 #include "model.h"
 #include "objectloader.h"
 #include <QImage>
+#include <QGLWidget>
 
 namespace Charge
 {
@@ -68,6 +69,8 @@ namespace Charge
             return;
         }
 
+        const QImage glImage = QGLWidget::convertToGLFormat(image);
+
         if(!textures.contains(texname))
         {
             GLuint id;
@@ -81,7 +84,7 @@ namespace Charge
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, true);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, image.width(), image.height(), 0, GL_BGRA, GL_UNSIGNED_BYTE, image.bits());
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, image.width(), image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, glImage.bits());
     }
 
     void Model::draw(QGLShaderProgram *shaderProgram)
@@ -113,9 +116,10 @@ namespace Charge
                 GLuint id = iter.value();
                 QString texname = iter.key();
                 glActiveTexture(GL_TEXTURE0 + num);
+
                 glBindTexture(GL_TEXTURE_2D, id);
 
-                shaderProgram->setUniformValue((const char*) texname.data(), num);
+                shaderProgram->setUniformValue(texname.toAscii().data(), num);
                 num++;
             }
         }

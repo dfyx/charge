@@ -76,7 +76,7 @@ namespace Charge
 
                 QVector2D texCoord = texCoords[(*iter)[3 * i + 1] - 1];
                 texCoordArray[2 * (3 * offset + i) + 0] = texCoord.x();
-                texCoordArray[2 * (3 * offset + i) + 1] = 1.0 - texCoord.y();
+                texCoordArray[2 * (3 * offset + i) + 1] = texCoord.y();
 
                 QVector3D normal = normals[(*iter)[3 * i + 2] - 1];
                 normalArray[3 * (3 * offset + i) + 0] = normal.x();
